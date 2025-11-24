@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monthly Report - அணிந்து மகிழ்</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="page-container">
+            <div class="page-header">
+                <h2><i class="fas fa-calendar-alt"></i> Monthly Report</h2>
+                <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Home</a>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <input type="text" id="searchInput" placeholder="🔍 Search by date or amount..." 
+                       style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1rem;"
+                       onkeyup="filterData()">
+            </div>
+
+            <form id="monthlyReportForm" onsubmit="handleSubmit(event)">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="date">Date</label>
+                        <input type="date" id="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="shop1">Shop 1</label>
+                        <input type="number" id="shop1" step="0.01" oninput="calculateMonthlyReport()" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="shop2">Shop 2</label>
+                        <input type="number" id="shop2" step="0.01" oninput="calculateMonthlyReport()" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="house1">House 1</label>
+                        <input type="number" id="house1" step="0.01" oninput="calculateMonthlyReport()" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="house2">House 2</label>
+                        <input type="number" id="house2" step="0.01" oninput="calculateMonthlyReport()" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="days">Days</label>
+                        <input type="number" id="days" step="0.01" oninput="calculateMonthlyReport()" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="fixedCost">Fixed Cost (Auto)</label>
+                        <input type="number" id="fixedCost" class="calculated-field" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="dailyFixedCost">Daily Fixed Cost (Auto)</label>
+                        <input type="number" id="dailyFixedCost" class="calculated-field" readonly>
+                    </div>
+                </div>
+                <input type="hidden" id="recordId">
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        <i class="fas fa-save"></i> Save
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                </div>
+            </form>
+
+            <div id="dataTableContainer">
+                <table class="data-table" id="dataTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Shop 1</th>
+                            <th>Shop 2</th>
+                            <th>House 1</th>
+                            <th>House 2</th>
+                            <th>Days</th>
+                            <th>Fixed Cost</th>
+                            <th>Daily Fixed Cost</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        const STORAGE_KEY = 'monthlyReports';
+        let editingId = null;
+        let allData = [];
+
+        function calculateMonthlyReport() {
+            const shop1 = parseFloat(document.getElementById('shop1').value) || 0;
+            const shop2 = parseFloat(document.getElementById('shop2').value) || 0;
+            const house1 = parseFloat(document.getElementById('house1').value) || 0;
+            const house2 = parseFloat(document.getElementById('house2').value) || 0;
+            const days = parseFloat(document.getElementById('days').value) || 1;
+
+            const fixedCost = Calculations.calculateFixedCost(shop1, shop2, house1, house2);
+            const dailyFixedCost = Calculations.calculateDailyFixedCost(fixedCost, days);
+
+            document.getElementById('fixedCost').value = fixedCost.toFixed(2);
+            document.getElementById('dailyFixedCost').value = dailyFixedCost.toFixed(2);
+        }
+
+        function handleSubmit(e) {
+            e.preventDefault();
+            const formData = {
+                date: document.getElementById('date').value,
+                shop1: document.getElementById('shop1').value,
+                shop2: document.getElementById('shop2').value,
+                house1: document.getElementById('house1').value,
+                house2: document.getElementById('house2').value,
+                days: document.getElementById('days').value,
+                fixedCost: document.getElementById('fixedCost').value,
+                dailyFixedCost: document.getElementById('dailyFixedCost').value,
+                date: new Date().toISOString()
+            };
+
+            if (editingId) {
+                Storage.update(STORAGE_KEY, editingId, formData);
+                editingId = null;
+                document.getElementById('submitBtn').innerHTML = '<i class="fas fa-save"></i> Save';
+            } else {
+                Storage.add(STORAGE_KEY, formData);
+            }
+
+            resetForm();
+            loadData();
+        }
+
+        function loadData() {
+            allData = Storage.get(STORAGE_KEY);
+            filterData();
+        }
+
+        function filterData() {
+            const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
+            const filtered = allData.filter(item => {
+                const searchableText = [
+                    formatDate(item.date),
+                    item.shop1, item.shop2, item.house1, item.house2,
+                    item.days, item.fixedCost, item.dailyFixedCost
+                ].join(' ').toLowerCase();
+                return searchableText.includes(searchTerm);
+            });
+
+            const tbody = document.getElementById('tableBody');
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" class="empty-state"><i class="fas fa-inbox"></i><br>No records found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(item => `
+                <tr>
+                    <td>${formatDate(item.date)}</td>
+                    <td>${formatCurrency(item.shop1)}</td>
+                    <td>${formatCurrency(item.shop2)}</td>
+                    <td>${formatCurrency(item.house1)}</td>
+                    <td>${formatCurrency(item.house2)}</td>
+                    <td>${item.days}</td>
+                    <td>${formatCurrency(item.fixedCost)}</td>
+                    <td>${formatCurrency(item.dailyFixedCost)}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn action-btn-edit" onclick="editRecord('${item.id}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn action-btn-delete" onclick="deleteRecord('${item.id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function editRecord(id) {
+            const data = Storage.get(STORAGE_KEY);
+            const record = data.find(item => item.id === id);
+            if (record) {
+                document.getElementById('date').value = record.date || '';
+                document.getElementById('shop1').value = record.shop1;
+                document.getElementById('shop2').value = record.shop2;
+                document.getElementById('house1').value = record.house1;
+                document.getElementById('house2').value = record.house2;
+                document.getElementById('days').value = record.days;
+                document.getElementById('recordId').value = id;
+                editingId = id;
+                document.getElementById('submitBtn').innerHTML = '<i class="fas fa-save"></i> Update';
+                calculateMonthlyReport();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function deleteRecord(id) {
+            if (confirm('Are you sure you want to delete this record?')) {
+                Storage.delete(STORAGE_KEY, id);
+                loadData();
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('monthlyReportForm').reset();
+            editingId = null;
+            document.getElementById('submitBtn').innerHTML = '<i class="fas fa-save"></i> Save';
+            calculateMonthlyReport();
+        }
+
+        // Set today's date as default
+        document.getElementById('date').valueAsDate = new Date();
+        // Initialize
+        calculateMonthlyReport();
+        loadData();
+    </script>
+</body>
+</html>
+
+

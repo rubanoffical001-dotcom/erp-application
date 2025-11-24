@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Menu - அணிந்து மகிழ்</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="brand-name">அணிந்து மகிழ்</h1>
+            <p class="tagline">We Design Your Dreams</p>
+        </header>
+
+        <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); max-width: 1000px; margin: 0 auto;">
+            <div class="dashboard-card" onclick="navigateTo('monthly-report.html')">
+                <div class="card-icon">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <h3>Monthly Report</h3>
+                <p>View and manage monthly reports</p>
+            </div>
+
+            <div class="dashboard-card" onclick="navigateTo('daily-report.html')">
+                <div class="card-icon">
+                    <i class="fas fa-calendar-day"></i>
+                </div>
+                <h3>Daily Report</h3>
+                <p>Track daily operations and expenses</p>
+            </div>
+
+            <div class="dashboard-card" onclick="navigateTo('orders.html')">
+                <div class="card-icon">
+                    <i class="fas fa-shopping-bag"></i>
+                </div>
+                <h3>Orders</h3>
+                <p>Regular or Bulk Orders</p>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <a href="index.html" class="back-btn">
+                <i class="fas fa-home"></i> Back to Home
+            </a>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
+

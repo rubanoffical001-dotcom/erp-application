@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Report - அணிந்து மகிழ்</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="page-container">
+            <div class="page-header">
+                <h2><i class="fas fa-calendar-day"></i> Daily Report</h2>
+                <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Home</a>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <input type="text" id="searchInput" placeholder="🔍 Search by date, name, or amount..." 
+                       style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1rem;"
+                       onkeyup="filterData()">
+            </div>
+
+            <form id="dailyReportForm" onsubmit="handleSubmit(event)">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="date">Date</label>
+                        <input type="date" id="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="tailor1Name">Tailor 1 - Name</label>
+                        <input type="text" id="tailor1Name" placeholder="Enter name">
+                    </div>
+                    <div class="form-group">
+                        <label for="tailor1">Tailor 1 - Amount</label>
+                        <input type="number" id="tailor1" step="0.01" oninput="calculateDailyReport()">
+                    </div>
+                    <div class="form-group">
+                        <label for="tailor2Name">Tailor 2 - Name</label>
+                        <input type="text" id="tailor2Name" placeholder="Enter name">
+                    </div>
+                    <div class="form-group">
+                        <label for="tailor2">Tailor 2 - Amount</label>
+                        <input type="number" id="tailor2" step="0.01" oninput="calculateDailyReport()">
+                    </div>
+                    <div class="form-group">
+                        <label for="tailor3Name">Tailor 3 - Name</label>
+                        <input type="text" id="tailor3Name" placeholder="Enter name">
+                    </div>
+                    <div class="form-group">
+                        <label for="tailor3">Tailor 3 - Amount</label>
+                        <input type="number" id="tailor3" step="0.01" oninput="calculateDailyReport()">
+                    </div>
+                    <div class="form-group">
+                        <label for="tailor4Name">Tailor 4 - Name</label>
+                        <input type="text" id="tailor4Name" placeholder="Enter name">
+                    </div>
+                    <div class="form-group">
+                        <label for="tailor4">Tailor 4 - Amount</label>
+                        <input type="number" id="tailor4" step="0.01" oninput="calculateDailyReport()">
+                    </div>
+                    <div class="form-group">
+                        <label for="tailor5Name">Tailor 5 - Name</label>
+                        <input type="text" id="tailor5Name" placeholder="Enter name">
+                    </div>
+                    <div class="form-group">
+                        <label for="tailor5">Tailor 5 - Amount</label>
+                        <input type="number" id="tailor5" step="0.01" oninput="calculateDailyReport()">
+                    </div>
+                    <div class="form-group">
+                        <label for="tailor6Name">Tailor 6 - Name</label>
+                        <input type="text" id="tailor6Name" placeholder="Enter name">
+                    </div>
+                    <div class="form-group">
+                        <label for="tailor6">Tailor 6 - Amount</label>
+                        <input type="number" id="tailor6" step="0.01" oninput="calculateDailyReport()">
+                    </div>
+                    <div class="form-group">
+                        <label for="helper1Name">Helper 1 - Name</label>
+                        <input type="text" id="helper1Name" placeholder="Enter name">
+                    </div>
+                    <div class="form-group">
+                        <label for="helper1">Helper 1 - Amount</label>
+                        <input type="number" id="helper1" step="0.01" oninput="calculateDailyReport()">
+                    </div>
+                    <div class="form-group">
+                        <label for="helper2Name">Helper 2 - Name</label>
+                        <input type="text" id="helper2Name" placeholder="Enter name">
+                    </div>
+                    <div class="form-group">
+                        <label for="helper2">Helper 2 - Amount</label>
+                        <input type="number" id="helper2" step="0.01" oninput="calculateDailyReport()">
+                    </div>
+                    <div class="form-group">
+                        <label for="pettyCashReason">Petty Cash - Reason</label>
+                        <input type="text" id="pettyCashReason" placeholder="Enter reason">
+                    </div>
+                    <div class="form-group">
+                        <label for="pettyCash">Petty Cash - Amount</label>
+                        <input type="number" id="pettyCash" step="0.01" oninput="calculateDailyReport()">
+                    </div>
+                    <div class="form-group">
+                        <label for="totalSalary">Total Tailor Salary (Auto)</label>
+                        <input type="number" id="totalSalary" class="calculated-field" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="totalHelperSalary">Total Helper Salary (Auto)</label>
+                        <input type="number" id="totalHelperSalary" class="calculated-field" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="totalProduction">Total Production Today</label>
+                        <input type="number" id="totalProduction" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="todayHandReceivedCash">Today Hand Received Cash</label>
+                        <input type="number" id="todayHandReceivedCash" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="ebOpen">EB Open</label>
+                        <input type="number" id="ebOpen" step="0.01" oninput="calculateDailyReport()">
+                    </div>
+                    <div class="form-group">
+                        <label for="ebClose">EB Close</label>
+                        <input type="number" id="ebClose" step="0.01" oninput="calculateDailyReport()">
+                    </div>
+                    <div class="form-group">
+                        <label for="ebUsage">EB Usage (Auto) <i class="fas fa-info-circle" style="color: #667eea; cursor: help;" title="Calculation: (EB Close - EB Open) × 13"></i></label>
+                        <input type="number" id="ebUsage" class="calculated-field" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="dailyExpense">Daily Expense (Auto)</label>
+                        <input type="number" id="dailyExpense" class="calculated-field" readonly>
+                    </div>
+                </div>
+                <input type="hidden" id="recordId">
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        <i class="fas fa-save"></i> Save
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                </div>
+            </form>
+
+            <div id="dataTableContainer">
+                <table class="data-table" id="dataTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Total Salary</th>
+                            <th>Total Helper Salary</th>
+                            <th>Petty Cash</th>
+                            <th>EB Usage</th>
+                            <th>Daily Expense</th>
+                            <th>Production</th>
+                            <th>Hand Received</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        const STORAGE_KEY = 'dailyReports';
+        let editingId = null;
+        let allData = [];
+
+        function calculateDailyReport() {
+            const tailors = [
+                parseFloat(document.getElementById('tailor1').value) || 0,
+                parseFloat(document.getElementById('tailor2').value) || 0,
+                parseFloat(document.getElementById('tailor3').value) || 0,
+                parseFloat(document.getElementById('tailor4').value) || 0,
+                parseFloat(document.getElementById('tailor5').value) || 0,
+                parseFloat(document.getElementById('tailor6').value) || 0
+            ];
+            const helpers = [
+                parseFloat(document.getElementById('helper1').value) || 0,
+                parseFloat(document.getElementById('helper2').value) || 0
+            ];
+            const pettyCash = parseFloat(document.getElementById('pettyCash').value) || 0;
+            const ebOpen = parseFloat(document.getElementById('ebOpen').value) || 0;
+            const ebClose = parseFloat(document.getElementById('ebClose').value) || 0;
+
+            const totalSalary = Calculations.calculateTotalSalary(tailors);
+            const totalHelperSalary = Calculations.calculateTotalHelperSalary(helpers);
+            const ebUsage = Calculations.calculateEBUsage(ebOpen, ebClose);
+            const dailyExpense = Calculations.calculateDailyExpense(pettyCash, totalSalary, totalHelperSalary, ebUsage);
+
+            document.getElementById('totalSalary').value = totalSalary.toFixed(2);
+            document.getElementById('totalHelperSalary').value = totalHelperSalary.toFixed(2);
+            document.getElementById('ebUsage').value = ebUsage.toFixed(2);
+            document.getElementById('dailyExpense').value = dailyExpense.toFixed(2);
+        }
+
+        function handleSubmit(e) {
+            e.preventDefault();
+            const formData = {
+                date: document.getElementById('date').value,
+                tailor1Name: document.getElementById('tailor1Name').value || '',
+                tailor1: document.getElementById('tailor1').value || 0,
+                tailor2Name: document.getElementById('tailor2Name').value || '',
+                tailor2: document.getElementById('tailor2').value || 0,
+                tailor3Name: document.getElementById('tailor3Name').value || '',
+                tailor3: document.getElementById('tailor3').value || 0,
+                tailor4Name: document.getElementById('tailor4Name').value || '',
+                tailor4: document.getElementById('tailor4').value || 0,
+                tailor5Name: document.getElementById('tailor5Name').value || '',
+                tailor5: document.getElementById('tailor5').value || 0,
+                tailor6Name: document.getElementById('tailor6Name').value || '',
+                tailor6: document.getElementById('tailor6').value || 0,
+                helper1Name: document.getElementById('helper1Name').value || '',
+                helper1: document.getElementById('helper1').value || 0,
+                helper2Name: document.getElementById('helper2Name').value || '',
+                helper2: document.getElementById('helper2').value || 0,
+                pettyCashReason: document.getElementById('pettyCashReason').value || '',
+                pettyCash: document.getElementById('pettyCash').value || 0,
+                totalSalary: document.getElementById('totalSalary').value,
+                totalHelperSalary: document.getElementById('totalHelperSalary').value,
+                totalProduction: document.getElementById('totalProduction').value || 0,
+                todayHandReceivedCash: document.getElementById('todayHandReceivedCash').value || 0,
+                ebOpen: document.getElementById('ebOpen').value || 0,
+                ebClose: document.getElementById('ebClose').value || 0,
+                ebUsage: document.getElementById('ebUsage').value,
+                dailyExpense: document.getElementById('dailyExpense').value
+            };
+
+            if (editingId) {
+                Storage.update(STORAGE_KEY, editingId, formData);
+                editingId = null;
+                document.getElementById('submitBtn').innerHTML = '<i class="fas fa-save"></i> Save';
+            } else {
+                Storage.add(STORAGE_KEY, formData);
+            }
+
+            resetForm();
+            loadData();
+        }
+
+        function loadData() {
+            allData = Storage.get(STORAGE_KEY);
+            filterData();
+        }
+
+        function filterData() {
+            const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
+            const filtered = allData.filter(item => {
+                const searchableText = [
+                    formatDate(item.date),
+                    item.tailor1Name, item.tailor2Name, item.tailor3Name,
+                    item.tailor4Name, item.tailor5Name, item.tailor6Name,
+                    item.helper1Name, item.helper2Name,
+                    item.pettyCashReason,
+                    item.totalSalary, item.totalHelperSalary, item.pettyCash,
+                    item.ebUsage, item.dailyExpense
+                ].join(' ').toLowerCase();
+                return searchableText.includes(searchTerm);
+            });
+
+            const tbody = document.getElementById('tableBody');
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" class="empty-state"><i class="fas fa-inbox"></i><br>No records found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(item => `
+                <tr>
+                    <td>${formatDate(item.date)}</td>
+                    <td>${formatCurrency(item.totalSalary)}</td>
+                    <td>${formatCurrency(item.totalHelperSalary)}</td>
+                    <td>${formatCurrency(item.pettyCash)}</td>
+                    <td>${formatCurrency(item.ebUsage)}</td>
+                    <td>${formatCurrency(item.dailyExpense)}</td>
+                    <td>${formatCurrency(item.totalProduction)}</td>
+                    <td>${formatCurrency(item.todayHandReceivedCash)}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn action-btn-edit" onclick="editRecord('${item.id}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn action-btn-delete" onclick="deleteRecord('${item.id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function editRecord(id) {
+            const data = Storage.get(STORAGE_KEY);
+            const record = data.find(item => item.id === id);
+            if (record) {
+                document.getElementById('date').value = record.date;
+                document.getElementById('tailor1Name').value = record.tailor1Name || '';
+                document.getElementById('tailor1').value = record.tailor1;
+                document.getElementById('tailor2Name').value = record.tailor2Name || '';
+                document.getElementById('tailor2').value = record.tailor2;
+                document.getElementById('tailor3Name').value = record.tailor3Name || '';
+                document.getElementById('tailor3').value = record.tailor3;
+                document.getElementById('tailor4Name').value = record.tailor4Name || '';
+                document.getElementById('tailor4').value = record.tailor4;
+                document.getElementById('tailor5Name').value = record.tailor5Name || '';
+                document.getElementById('tailor5').value = record.tailor5;
+                document.getElementById('tailor6Name').value = record.tailor6Name || '';
+                document.getElementById('tailor6').value = record.tailor6;
+                document.getElementById('helper1Name').value = record.helper1Name || '';
+                document.getElementById('helper1').value = record.helper1;
+                document.getElementById('helper2Name').value = record.helper2Name || '';
+                document.getElementById('helper2').value = record.helper2;
+                document.getElementById('pettyCashReason').value = record.pettyCashReason || '';
+                document.getElementById('pettyCash').value = record.pettyCash;
+                document.getElementById('totalProduction').value = record.totalProduction;
+                document.getElementById('todayHandReceivedCash').value = record.todayHandReceivedCash;
+                document.getElementById('ebOpen').value = record.ebOpen;
+                document.getElementById('ebClose').value = record.ebClose;
+                document.getElementById('recordId').value = id;
+                editingId = id;
+                document.getElementById('submitBtn').innerHTML = '<i class="fas fa-save"></i> Update';
+                calculateDailyReport();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function deleteRecord(id) {
+            if (confirm('Are you sure you want to delete this record?')) {
+                Storage.delete(STORAGE_KEY, id);
+                loadData();
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('dailyReportForm').reset();
+            editingId = null;
+            document.getElementById('submitBtn').innerHTML = '<i class="fas fa-save"></i> Save';
+            calculateDailyReport();
+        }
+
+        // Set today's date as default
+        document.getElementById('date').valueAsDate = new Date();
+        calculateDailyReport();
+        loadData();
+    </script>
+</body>
+</html>

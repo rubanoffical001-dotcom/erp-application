@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profit or Loss - அணிந்து மகிழ்</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="page-container">
+            <div class="page-header">
+                <h2><i class="fas fa-chart-line"></i> Profit or Loss</h2>
+                <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Home</a>
+            </div>
+
+            <div style="margin-bottom: 30px;">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="startDate">Start Date</label>
+                        <input type="date" id="startDate" onchange="calculateProfitLoss()">
+                    </div>
+                    <div class="form-group">
+                        <label for="endDate">End Date</label>
+                        <input type="date" id="endDate" onchange="calculateProfitLoss()">
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button class="btn btn-primary" onclick="calculateProfitLoss()">
+                        <i class="fas fa-calculator"></i> Calculate
+                    </button>
+                    <button class="btn btn-success" onclick="exportToPDF()" id="exportBtn">
+                        <i class="fas fa-file-pdf"></i> Export as PDF
+                    </button>
+                </div>
+            </div>
+
+            <div class="summary-cards" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                <div class="summary-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px;">
+                    <h3 style="margin-bottom: 10px;">Total Revenue</h3>
+                    <p id="totalRevenue" style="font-size: 2rem; font-weight: bold;">₹0.00</p>
+                </div>
+                <div class="summary-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 20px; border-radius: 10px;">
+                    <h3 style="margin-bottom: 10px;">Total Expenses</h3>
+                    <p id="totalExpenses" style="font-size: 2rem; font-weight: bold;">₹0.00</p>
+                </div>
+                <div class="summary-card" id="profitLossCard" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 20px; border-radius: 10px;">
+                    <h3 style="margin-bottom: 10px;">Net Profit/Loss</h3>
+                    <p id="netProfitLoss" style="font-size: 2rem; font-weight: bold;">₹0.00</p>
+                </div>
+            </div>
+
+            <div id="dataTableContainer">
+                <h3 style="margin-bottom: 15px;">Detailed Report</h3>
+                <table class="data-table" id="dataTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Revenue</th>
+                            <th>Expenses</th>
+                            <th>Net</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="app.js"></script>
+    <script>
+        let currentReportData = null;
+
+        function exportToPDF() {
+            if (!currentReportData || currentReportData.length === 0) {
+                alert('Please calculate the report first');
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Title
+            doc.setFontSize(20);
+            doc.text('அணிந்து மகிழ் - Profit or Loss Report', 14, 20);
+            doc.setFontSize(12);
+            doc.text('We Design Your Dreams', 14, 28);
+            
+            // Date Range
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            doc.text(`Period: ${formatDate(startDate)} to ${formatDate(endDate)}`, 14, 36);
+            
+            // Summary
+            const totalRevenue = parseFloat(document.getElementById('totalRevenue').textContent.replace(/[₹,]/g, '')) || 0;
+            const totalExpenses = parseFloat(document.getElementById('totalExpenses').textContent.replace(/[₹,]/g, '')) || 0;
+            const netProfitLoss = parseFloat(document.getElementById('netProfitLoss').textContent.replace(/[₹,]/g, '')) || 0;
+            
+            doc.setFontSize(14);
+            doc.text('Summary', 14, 48);
+            doc.setFontSize(10);
+            doc.text(`Total Revenue: ${formatCurrency(totalRevenue)}`, 14, 56);
+            doc.text(`Total Expenses: ${formatCurrency(totalExpenses)}`, 14, 64);
+            doc.text(`Net Profit/Loss: ${formatCurrency(netProfitLoss)}`, 14, 72);
+            
+            // Table
+            let yPos = 85;
+            doc.setFontSize(10);
+            doc.text('Date', 14, yPos);
+            doc.text('Type', 50, yPos);
+            doc.text('Revenue', 90, yPos);
+            doc.text('Expenses', 130, yPos);
+            doc.text('Net', 170, yPos);
+            
+            yPos += 5;
+            doc.line(14, yPos, 200, yPos);
+            yPos += 5;
+            
+            currentReportData.forEach(item => {
+                if (yPos > 270) {
+                    doc.addPage();
+                    yPos = 20;
+                }
+                doc.text(formatDate(item.date), 14, yPos);
+                doc.text(item.type, 50, yPos);
+                doc.text(formatCurrency(item.revenue), 90, yPos);
+                doc.text(formatCurrency(item.expense), 130, yPos);
+                doc.text(formatCurrency(item.net), 170, yPos);
+                yPos += 7;
+            });
+            
+            // Total row
+            yPos += 2;
+            doc.line(14, yPos, 200, yPos);
+            yPos += 5;
+            doc.setFontStyle('bold');
+            doc.text('TOTAL', 14, yPos);
+            doc.text(formatCurrency(totalRevenue), 90, yPos);
+            doc.text(formatCurrency(totalExpenses), 130, yPos);
+            doc.text(formatCurrency(netProfitLoss), 170, yPos);
+            
+            // Save
+            const fileName = `Profit_Loss_${startDate}_to_${endDate}.pdf`;
+            doc.save(fileName);
+        }
+
+        function calculateProfitLoss() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            if (!startDate || !endDate) {
+                alert('Please select both start and end dates');
+                return;
+            }
+
+            // Get all orders
+            const orders = Storage.get('orders');
+            const dailyReports = Storage.get('dailyReports');
+            const encash = Storage.get('encash');
+
+            let totalRevenue = 0;
+            let totalExpenses = 0;
+            const reportData = [];
+
+            // Calculate revenue from orders
+            orders.forEach(order => {
+                const orderDate = new Date(order.date);
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                
+                if (orderDate >= start && orderDate <= end) {
+                    const revenue = order.orderType === 'Boutique' ? 
+                        parseFloat(order.boutiqueOrderBill) : 
+                        parseFloat(order.bulkTotalBill);
+                    const expense = order.orderType === 'Boutique' ? 
+                        parseFloat(order.boutiqueTotalExpense) : 
+                        parseFloat(order.bulkTotalExpense);
+                    
+                    totalRevenue += revenue;
+                    totalExpenses += expense;
+                    
+                    reportData.push({
+                        date: order.date,
+                        type: 'Order - ' + order.orderType,
+                        revenue: revenue,
+                        expense: expense,
+                        net: revenue - expense
+                    });
+                }
+            });
+
+            // Add encash as revenue
+            encash.forEach(item => {
+                const itemDate = new Date(item.date);
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                
+                if (itemDate >= start && itemDate <= end) {
+                    const amount = parseFloat(item.amount) || 0;
+                    totalRevenue += amount;
+                    
+                    reportData.push({
+                        date: item.date,
+                        type: 'Encash',
+                        revenue: amount,
+                        expense: 0,
+                        net: amount
+                    });
+                }
+            });
+
+            // Add daily expenses
+            dailyReports.forEach(report => {
+                const reportDate = new Date(report.date);
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                
+                if (reportDate >= start && reportDate <= end) {
+                    const expense = parseFloat(report.dailyExpense) || 0;
+                    totalExpenses += expense;
+                    
+                    reportData.push({
+                        date: report.date,
+                        type: 'Daily Expense',
+                        revenue: 0,
+                        expense: expense,
+                        net: -expense
+                    });
+                }
+            });
+
+            const netProfitLoss = totalRevenue - totalExpenses;
+
+            // Update summary cards
+            document.getElementById('totalRevenue').textContent = formatCurrency(totalRevenue);
+            document.getElementById('totalExpenses').textContent = formatCurrency(totalExpenses);
+            document.getElementById('netProfitLoss').textContent = formatCurrency(netProfitLoss);
+
+            // Update profit/loss card color
+            const profitLossCard = document.getElementById('profitLossCard');
+            if (netProfitLoss >= 0) {
+                profitLossCard.style.background = 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)';
+            } else {
+                profitLossCard.style.background = 'linear-gradient(135deg, #eb3349 0%, #f45c43 100%)';
+            }
+
+            // Update table
+            const tbody = document.getElementById('tableBody');
+            if (reportData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><i class="fas fa-inbox"></i><br>No records found for selected period</td></tr>';
+                return;
+            }
+
+            // Sort by date
+            reportData.sort((a, b) => new Date(a.date) - new Date(b.date));
+            
+            // Store for PDF export
+            currentReportData = reportData;
+
+            tbody.innerHTML = reportData.map(item => {
+                const netColor = item.net >= 0 ? '#28a745' : '#dc3545';
+                return `
+                    <tr>
+                        <td>${formatDate(item.date)}</td>
+                        <td>${item.type}</td>
+                        <td>${formatCurrency(item.revenue)}</td>
+                        <td>${formatCurrency(item.expense)}</td>
+                        <td style="color: ${netColor}; font-weight: bold;">${formatCurrency(item.net)}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            // Add total row
+            tbody.innerHTML += `
+                <tr style="background: #f8f9fa; font-weight: bold;">
+                    <td colspan="2">TOTAL</td>
+                    <td>${formatCurrency(totalRevenue)}</td>
+                    <td>${formatCurrency(totalExpenses)}</td>
+                    <td style="color: ${netProfitLoss >= 0 ? '#28a745' : '#dc3545'};">
+                        ${formatCurrency(netProfitLoss)}
+                    </td>
+                </tr>
+            `;
+        }
+
+        // Set default dates (current month)
+        const today = new Date();
+        const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+        const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        
+        document.getElementById('startDate').valueAsDate = firstDay;
+        document.getElementById('endDate').valueAsDate = lastDay;
+        
+        // Calculate on load
+        calculateProfitLoss();
+    </script>
+</body>
+</html>
+
+

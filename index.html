@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>அணிந்து மகிழ் - We Design Your Dreams</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="brand-name">அணிந்து மகிழ்</h1>
+            <p class="tagline">We Design Your Dreams</p>
+        </header>
+
+        <div class="dashboard-grid">
+            <div class="dashboard-card" onclick="navigateTo('monthly-report.html')">
+                <div class="card-icon">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <h3>Monthly Report</h3>
+                <p>View and manage monthly reports</p>
+            </div>
+
+            <div class="dashboard-card" onclick="navigateTo('daily-report.html')">
+                <div class="card-icon">
+                    <i class="fas fa-calendar-day"></i>
+                </div>
+                <h3>Daily Report</h3>
+                <p>Track daily operations and expenses</p>
+            </div>
+
+            <div class="dashboard-card" onclick="navigateTo('main-menu.html')">
+                <div class="card-icon">
+                    <i class="fas fa-bars"></i>
+                </div>
+                <h3>Main Menu</h3>
+                <p>Monthly Report, Daily Report, Orders</p>
+            </div>
+
+            <div class="dashboard-card" onclick="navigateTo('orders.html')">
+                <div class="card-icon">
+                    <i class="fas fa-shopping-bag"></i>
+                </div>
+                <h3>Orders</h3>
+                <p>Boutique Order / Bulk Order</p>
+            </div>
+
+            <div class="dashboard-card" onclick="navigateTo('encash.html')">
+                <div class="card-icon">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <h3>Encash</h3>
+                <p>Manage encashments</p>
+            </div>
+
+            <div class="dashboard-card" onclick="navigateTo('target.html')">
+                <div class="card-icon">
+                    <i class="fas fa-bullseye"></i>
+                </div>
+                <h3>Target</h3>
+                <p>Set and track targets</p>
+            </div>
+
+            <div class="dashboard-card" onclick="navigateTo('profit-loss.html')">
+                <div class="card-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>Profit or Loss</h3>
+                <p>View profit and loss reports</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
+
+

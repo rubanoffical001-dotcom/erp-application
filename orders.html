@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders - அணிந்து மகிழ்</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="page-container">
+            <div class="page-header">
+                <h2><i class="fas fa-shopping-bag"></i> Orders</h2>
+                <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Home</a>
+            </div>
+
+            <form id="orderForm" onsubmit="handleSubmit(event)">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="date">Date</label>
+                        <input type="date" id="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="customerName">Customer Name</label>
+                        <input type="text" id="customerName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="orderType">Order Type</label>
+                        <select id="orderType" onchange="toggleOrderFields()" required>
+                            <option value="">Select Type</option>
+                            <option value="Boutique">Boutique Order</option>
+                            <option value="Bulk">Bulk Order</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="numberOfPieces">Number of Pieces</label>
+                        <input type="number" id="numberOfPieces" step="1" min="1" oninput="calculateOrders()" value="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="service">Service</label>
+                        <input type="text" id="service" placeholder="Enter service description">
+                    </div>
+                    <div class="form-group" id="serviceAmountGroup">
+                        <label for="serviceAmount">Service Amount</label>
+                        <input type="number" id="serviceAmount" step="0.01" oninput="calculateOrders()">
+                    </div>
+                    <div class="form-group">
+                        <label for="lining">Lining</label>
+                        <input type="number" id="lining" step="0.01" oninput="calculateOrders()">
+                    </div>
+                    <div class="form-group">
+                        <label for="falls">Falls</label>
+                        <input type="number" id="falls" step="0.01" oninput="calculateOrders()">
+                    </div>
+                    <div class="form-group">
+                        <label for="aari">Aari</label>
+                        <input type="number" id="aari" step="0.01" oninput="calculateOrders()">
+                    </div>
+                    <div class="form-group">
+                        <label for="embroidery">Embroidery</label>
+                        <input type="number" id="embroidery" step="0.01" oninput="calculateOrders()">
+                    </div>
+                    <div class="form-group">
+                        <label for="extraWork">Extra Work</label>
+                        <input type="number" id="extraWork" step="0.01" oninput="calculateOrders()">
+                    </div>
+                    <div class="form-group">
+                        <label for="mainFabric">Main Fabric</label>
+                        <input type="number" id="mainFabric" step="0.01" oninput="calculateOrders()">
+                    </div>
+                    <div class="form-group">
+                        <label for="cutting">Cutting</label>
+                        <input type="number" id="cutting" step="0.01" oninput="calculateOrders()">
+                    </div>
+                    <div class="form-group">
+                        <label for="stitching">Stitching</label>
+                        <input type="number" id="stitching" step="0.01" oninput="calculateOrders()">
+                    </div>
+                    <div class="form-group" id="boutiqueBillGroup">
+                        <label for="boutiqueOrderBill">Boutique Order Bill Amount (Auto)</label>
+                        <input type="number" id="boutiqueOrderBill" class="calculated-field" readonly>
+                    </div>
+                    <div class="form-group" id="bulkBillGroup" style="display: none;">
+                        <label for="bulkBill">Bulk Bill</label>
+                        <input type="number" id="bulkBill" step="0.01" oninput="calculateOrders()">
+                    </div>
+                    <div class="form-group" id="bulkTotalBillGroup" style="display: none;">
+                        <label for="bulkTotalBill">Bulk Total Bill (Auto)</label>
+                        <input type="number" id="bulkTotalBill" class="calculated-field" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="boutiqueTotalExpense">Boutique Total Expense (Auto)</label>
+                        <input type="number" id="boutiqueTotalExpense" class="calculated-field" readonly>
+                    </div>
+                    <div class="form-group" id="bulkTotalExpenseGroup" style="display: none;">
+                        <label for="bulkTotalExpense">Bulk Total Expense (Auto)</label>
+                        <input type="number" id="bulkTotalExpense" class="calculated-field" readonly>
+                    </div>
+                </div>
+                <input type="hidden" id="recordId">
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        <i class="fas fa-save"></i> Save
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                </div>
+            </form>
+
+            <div style="margin-bottom: 20px;">
+                <input type="text" id="searchInput" placeholder="🔍 Search by date, customer, type..." 
+                       style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1rem;"
+                       onkeyup="filterData()">
+            </div>
+
+            <div id="dataTableContainer">
+                <table class="data-table" id="dataTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Customer</th>
+                            <th>Type</th>
+                            <th>Pieces</th>
+                            <th>Bill Amount</th>
+                            <th>Total Expense</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        const STORAGE_KEY = 'orders';
+        let editingId = null;
+        let allData = [];
+
+        function toggleOrderFields() {
+            const orderType = document.getElementById('orderType').value;
+            const boutiqueFields = ['boutiqueBillGroup'];
+            const bulkFields = ['bulkBillGroup', 'bulkTotalBillGroup', 'bulkTotalExpenseGroup'];
+
+            boutiqueFields.forEach(id => {
+                document.getElementById(id).style.display = orderType === 'Boutique' ? 'block' : 'none';
+            });
+
+            bulkFields.forEach(id => {
+                document.getElementById(id).style.display = orderType === 'Bulk' ? 'block' : 'none';
+            });
+
+            calculateOrders();
+        }
+
+        function calculateOrders() {
+            const orderType = document.getElementById('orderType').value;
+            const serviceAmount = parseFloat(document.getElementById('serviceAmount').value) || 0;
+            const lining = parseFloat(document.getElementById('lining').value) || 0;
+            const falls = parseFloat(document.getElementById('falls').value) || 0;
+            const aari = parseFloat(document.getElementById('aari').value) || 0;
+            const embroidery = parseFloat(document.getElementById('embroidery').value) || 0;
+            const extraWork = parseFloat(document.getElementById('extraWork').value) || 0;
+            const mainFabric = parseFloat(document.getElementById('mainFabric').value) || 0;
+            const cutting = parseFloat(document.getElementById('cutting').value) || 0;
+            const stitching = parseFloat(document.getElementById('stitching').value) || 0;
+            const numberOfPieces = parseFloat(document.getElementById('numberOfPieces').value) || 1;
+            const bulkBill = parseFloat(document.getElementById('bulkBill').value) || 0;
+
+            const boutiqueOrderBill = Calculations.calculateBoutiqueOrderBill(serviceAmount);
+            const boutiqueTotalExpense = Calculations.calculateBoutiqueTotalExpense(
+                lining, falls, aari, embroidery, extraWork, mainFabric, cutting, stitching
+            );
+            const bulkTotalBill = Calculations.calculateBulkTotalBill(bulkBill, numberOfPieces);
+            const bulkTotalExpense = Calculations.calculateBulkTotalExpense(boutiqueTotalExpense, numberOfPieces);
+
+            if (orderType === 'Boutique') {
+                document.getElementById('boutiqueOrderBill').value = boutiqueOrderBill.toFixed(2);
+                document.getElementById('boutiqueTotalExpense').value = boutiqueTotalExpense.toFixed(2);
+            } else if (orderType === 'Bulk') {
+                document.getElementById('bulkTotalBill').value = bulkTotalBill.toFixed(2);
+                document.getElementById('boutiqueTotalExpense').value = boutiqueTotalExpense.toFixed(2);
+                document.getElementById('bulkTotalExpense').value = bulkTotalExpense.toFixed(2);
+            }
+        }
+
+        function handleSubmit(e) {
+            e.preventDefault();
+            const orderType = document.getElementById('orderType').value;
+            const formData = {
+                date: document.getElementById('date').value,
+                customerName: document.getElementById('customerName').value,
+                orderType: orderType,
+                numberOfPieces: document.getElementById('numberOfPieces').value,
+                service: document.getElementById('service').value || '',
+                serviceAmount: document.getElementById('serviceAmount').value || 0,
+                lining: document.getElementById('lining').value || 0,
+                falls: document.getElementById('falls').value || 0,
+                aari: document.getElementById('aari').value || 0,
+                embroidery: document.getElementById('embroidery').value || 0,
+                extraWork: document.getElementById('extraWork').value || 0,
+                mainFabric: document.getElementById('mainFabric').value || 0,
+                cutting: document.getElementById('cutting').value || 0,
+                stitching: document.getElementById('stitching').value || 0,
+                boutiqueOrderBill: orderType === 'Boutique' ? document.getElementById('boutiqueOrderBill').value : 0,
+                bulkBill: orderType === 'Bulk' ? document.getElementById('bulkBill').value || 0 : 0,
+                bulkTotalBill: orderType === 'Bulk' ? document.getElementById('bulkTotalBill').value : 0,
+                boutiqueTotalExpense: document.getElementById('boutiqueTotalExpense').value,
+                bulkTotalExpense: orderType === 'Bulk' ? document.getElementById('bulkTotalExpense').value : 0
+            };
+
+            if (editingId) {
+                Storage.update(STORAGE_KEY, editingId, formData);
+                editingId = null;
+                document.getElementById('submitBtn').innerHTML = '<i class="fas fa-save"></i> Save';
+            } else {
+                Storage.add(STORAGE_KEY, formData);
+            }
+
+            resetForm();
+            loadData();
+        }
+
+        function loadData() {
+            allData = Storage.get(STORAGE_KEY);
+            filterData();
+        }
+
+        function filterData() {
+            const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
+            const filtered = allData.filter(item => {
+                const searchableText = [
+                    formatDate(item.date),
+                    item.customerName,
+                    item.orderType,
+                    item.service || ''
+                ].join(' ').toLowerCase();
+                return searchableText.includes(searchTerm);
+            });
+
+            const tbody = document.getElementById('tableBody');
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><i class="fas fa-inbox"></i><br>No records found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(item => {
+                const billAmount = item.orderType === 'Boutique' ? item.boutiqueOrderBill : item.bulkTotalBill;
+                const totalExpense = item.orderType === 'Boutique' ? item.boutiqueTotalExpense : item.bulkTotalExpense;
+                return `
+                    <tr>
+                        <td>${formatDate(item.date)}</td>
+                        <td>${item.customerName}</td>
+                        <td>${item.orderType}</td>
+                        <td>${item.numberOfPieces}</td>
+                        <td>${formatCurrency(billAmount)}</td>
+                        <td>${formatCurrency(totalExpense)}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn action-btn-edit" onclick="editRecord('${item.id}')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn action-btn-delete" onclick="deleteRecord('${item.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function editRecord(id) {
+            const data = Storage.get(STORAGE_KEY);
+            const record = data.find(item => item.id === id);
+            if (record) {
+                document.getElementById('date').value = record.date;
+                document.getElementById('customerName').value = record.customerName;
+                document.getElementById('orderType').value = record.orderType;
+                document.getElementById('numberOfPieces').value = record.numberOfPieces;
+                document.getElementById('service').value = record.service || '';
+                document.getElementById('serviceAmount').value = record.serviceAmount || 0;
+                document.getElementById('lining').value = record.lining;
+                document.getElementById('falls').value = record.falls;
+                document.getElementById('aari').value = record.aari;
+                document.getElementById('embroidery').value = record.embroidery;
+                document.getElementById('extraWork').value = record.extraWork;
+                document.getElementById('mainFabric').value = record.mainFabric;
+                document.getElementById('cutting').value = record.cutting;
+                document.getElementById('stitching').value = record.stitching;
+                if (record.orderType === 'Bulk') {
+                    document.getElementById('bulkBill').value = record.bulkBill;
+                }
+                document.getElementById('recordId').value = id;
+                editingId = id;
+                document.getElementById('submitBtn').innerHTML = '<i class="fas fa-save"></i> Update';
+                toggleOrderFields();
+                calculateOrders();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function deleteRecord(id) {
+            if (confirm('Are you sure you want to delete this record?')) {
+                Storage.delete(STORAGE_KEY, id);
+                loadData();
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('orderForm').reset();
+            document.getElementById('numberOfPieces').value = 1;
+            editingId = null;
+            document.getElementById('submitBtn').innerHTML = '<i class="fas fa-save"></i> Save';
+            toggleOrderFields();
+            calculateOrders();
+        }
+
+        // Set today's date as default
+        document.getElementById('date').valueAsDate = new Date();
+        calculateOrders();
+        loadData();
+    </script>
+</body>
+</html>
+
+
